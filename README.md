@@ -63,3 +63,37 @@ O Regex busca por padrões de cupons de desconto.
 │ ----- ├── perfis.py     # Base de dados de influenciadores
 
 │ ------└── base_dados.py # Suporte para dados locais
+
+# Etapa 3
+
+# 📊 Auditoria de Influenciadores: Transparência e Sentimento
+
+Este projeto de **Ciência de Dados para Negócios** tem como objetivo auditar automaticamente postagens de influenciadores no Instagram, cruzando o nível de transparência das publicidades (Explicita vs. Omissa) com a reação real do público (Análise de Sentimento dos comentários).
+
+## 🚀 Funcionalidades do Pipeline de Dados (ETL)
+
+1. **Extração (Web Scraping / APIs):**
+   * Coleta das últimas postagens do perfil via API RESTful (Método `GET`).
+   * Extração granular de todos os comentários reais de cada post auditado (Método `POST`).
+
+2. **Transformação e Análise (Inteligência Artificial & NLP):**
+   * **Auditoria de Legenda:** Utilização da biblioteca `spaCy` (pt_core_news_lg) para Reconhecimento de Entidades Nomeadas (NER) e Expressões Regulares (Regex) para identificar marcas e cupons, classificando o post como *Publicidade Explícita*, *Publicidade Omissa* ou *Post Normal*.
+   * **Análise de Sentimento (Público):** Utilização da biblioteca `Transformers` (Hugging Face) com o modelo *BERT Multilingual* para ler e interpretar o contexto de cada comentário individual, classificando-os como *Positivos/Alegres*, *Neutros* ou *Críticos/Insatisfeitos*.
+
+3. **Carga e Visualização (Data Visualization):**
+   * Geração automática de Dashboards individuais para cada perfil analisado utilizando `Pandas`, `Matplotlib` e `Seaborn`.
+   * Visão granular do volume de publicidade vs. a reação específica do público em cada postagem.
+
+## 🛠️ Tecnologias Utilizadas
+
+* **Linguagem:** Python 3
+* **Processamento de Linguagem Natural (NLP):** spaCy, Hugging Face Transformers (BERT)
+* **Manipulação e Visualização de Dados:** Pandas, Matplotlib, Seaborn
+* **Integração de Dados:** Biblioteca `requests` para consumo da RapidAPI (Instagram Looter 2 e instagram120)
+
+## ⚙️ Como Executar
+
+1. Instale as dependências do projeto:
+   ```bash
+   pip install requests spacy transformers pandas matplotlib seaborn torch
+   python -m spacy download pt_core_news_lg
