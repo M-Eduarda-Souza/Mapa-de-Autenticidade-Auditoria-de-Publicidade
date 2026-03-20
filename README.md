@@ -62,4 +62,8 @@ O Regex busca por padrões de cupons de desconto.
 
 │ ----- ├── perfis.py     # Base de dados de influenciadores
 
+<<<<<<< HEAD
 │ ------└── base_dados.py # Suporte para dados locais
+=======
+│ ------└── base_dados.py # Suporte para dados locais
+>>>>>>> 72fbbca (3 fase do projeto, auditoria + análise de sentimetos e dashboards individuais)

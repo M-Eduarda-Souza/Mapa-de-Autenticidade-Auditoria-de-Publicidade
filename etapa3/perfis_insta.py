@@ -1,0 +1,1 @@
+perfis_para_auditoria = ['santadicas_', 'thaisslinares']
