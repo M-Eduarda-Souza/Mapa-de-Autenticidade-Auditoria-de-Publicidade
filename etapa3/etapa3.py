@@ -38,7 +38,6 @@ classificador_sentimento = pipeline(
 # 3. EXTRAÇÃO DE DADOS VIA WEB APIs
 # ==============================================================================
 def buscar_posts_do_perfil(usuario):
-    """Busca até 10 posts recentes do perfil."""
     usuario_limpo = usuario.replace("@", "")
     url = "https://instagram-looter2.p.rapidapi.com/profile"
     querystring = {"username": usuario_limpo}
@@ -55,7 +54,6 @@ def buscar_posts_do_perfil(usuario):
             edges = dados.get('edge_owner_to_timeline_media', {}).get('edges', [])
             
             posts_processados = []
-            # 🔥 AJUSTE 1: Aumentamos a amostragem para os 10 últimos posts!
             for p in edges[:10]: 
                 node = p.get('node', {})
                 post_id = node.get('shortcode', '')
@@ -73,7 +71,6 @@ def buscar_posts_do_perfil(usuario):
     return []
 
 def buscar_comentarios_do_post(post_id):
-    """Busca os comentários reais daquele post específico."""
     url = "https://instagram120.p.rapidapi.com/api/instagram/mediaByShortcode"
     payload = {"shortcode": post_id}
     headers = {
@@ -101,7 +98,7 @@ def buscar_comentarios_do_post(post_id):
 # 4. FUNÇÃO DE AUDITORIA (Lendo cada comentário individualmente)
 # ==============================================================================
 def auditar_post_e_reacao(legenda, comentarios):
-    # Auditoria de Publicidade (Gráfico 1)
+    #(Gráfico 1)
     doc = nlp(legenda)
     marcas = [ent.text for ent in doc.ents if ent.label_ == "ORG"]
     
@@ -118,7 +115,7 @@ def auditar_post_e_reacao(legenda, comentarios):
     else:
         diagnostico_publi = "Post Normal"
 
-    # 🔥 AJUSTE 2: Analisando CADA comentário para o Gráfico 2
+    # Analisando comentário para o Gráfico 2
     lista_sentimentos_individuais = []
     for com in comentarios:
         resultado_ia = classificador_sentimento(com[:512])[0]
@@ -138,7 +135,6 @@ def auditar_post_e_reacao(legenda, comentarios):
 # ==============================================================================
 print(f"\n{'='*80}\nSISTEMA DE AUDITORIA (VISÃO GRANULAR DE COMENTÁRIOS)\n{'='*80}")
 
-# Agora temos duas tabelas separadas para alimentar os dois gráficos de forma correta
 dados_posts = [] 
 dados_comentarios = []
 
@@ -151,7 +147,7 @@ for perfil in perfis_para_auditoria:
         continue
 
     for i, post in enumerate(posts):
-        ordem_post = f"{i+1}º Post" # Cria o rótulo "1º Post", "2º Post"...
+        ordem_post = f"{i+1}º Post"
         print(f"   ↳ Auditando {ordem_post} e classificando comentários...")
         
         comentarios_publico = buscar_comentarios_do_post(post['id'])
@@ -164,7 +160,7 @@ for perfil in perfis_para_auditoria:
             "Diagnóstico": diagnostico
         })
         
-        # Salva CADA comentário individualmente para o Gráfico 2
+        # Salva o comentário individualmente
         for sent in sentimentos_individuais:
             dados_comentarios.append({
                 "Perfil": perfil,
@@ -194,13 +190,13 @@ if dados_posts:
         fig, axes = plt.subplots(1, 2, figsize=(16, 7))
         fig.suptitle(f"Auditoria de Influenciador: @{perfil}", fontsize=18, fontweight='black', color='#2c3e50')
 
-        # --- GRÁFICO 1: TODOS OS POSTS DO PERFIL ---
+        # GRÁFICO 1 
         sns.countplot(
             data=df_p, 
             x="Diagnóstico", 
             hue="Diagnóstico",
             order=["Post Normal", "Publicidade Omissa", "Publicidade Explícita"],
-            palette="viridis",
+            palette={"Post Normal": "#075af3", "Publicidade Omissa": "#a00303", "Publicidade Explícita": "#fffb0b"},
             legend=False,
             ax=axes[0]
         )
@@ -209,17 +205,17 @@ if dados_posts:
         axes[0].set_ylabel("Quantidade de Posts Analisados")
         axes[0].yaxis.set_major_locator(ticker.MaxNLocator(integer=True))
 
-        # --- GRÁFICO 2: CADA COMENTÁRIO DENTRO DE CADA POST ---
+        # GRÁFICO 2:
         if len(df_c) > 0:
             sns.countplot(
                 data=df_c, 
-                y="Post", # Eixo Y agora são as publicações (1º Post, 2º Post...)
-                hue="Sentimento", # As cores são as classificações dos comentários
+                y="Post", 
+                hue="Sentimento", 
                 hue_order=["Alegre/Positivo", "Neutro", "Insatisfeito/Crítico"],
                 palette={"Alegre/Positivo": "#2ecc71", "Neutro": "#95a5a6", "Insatisfeito/Crítico": "#e74c3c"},
                 ax=axes[1]
             )
-            # Título atualizado conforme seu pedido
+            
             axes[1].set_title("Reação do Público (Comentários) X Publicação", fontsize=13, fontweight='bold')
             axes[1].set_ylabel("Publicações Analisadas")
             axes[1].set_xlabel("Quantidade de Comentários Individuais")
